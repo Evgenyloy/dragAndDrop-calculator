@@ -1,32 +1,56 @@
+import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
+import DigitButton from '../digitButton/DigitButton';
+import OperationButton from '../operationButton/Operationbutton';
+import { compute } from '../../slice/slice';
 import './calculator.scss';
 
 function Calculator() {
+  const dispatch = useAppDispatch();
+  const operation = useAppSelector((state) => state.calculator.operation);
+  const currentOperand = useAppSelector(
+    (state) => state.calculator.currentOperand
+  );
+  const previousOperand = useAppSelector(
+    (state) => state.calculator.previousOperand
+  );
+
   return (
     <div className="calculator">
       <div className="calculator__row-1">
-        <div className="calculator__output">1234</div>
+        <div className="calculator__output">
+          <div className="calculator__previous-operand">
+            {`${previousOperand} ${operation}`}
+          </div>
+          <div className="calculator__current-operand">{currentOperand}</div>
+        </div>
       </div>
       <div className="calculator__row-2">
-        <div className="calculator__operation-button">/</div>
-        <div className="calculator__operation-button">*</div>
-        <div className="calculator__operation-button">-</div>
-        <div className="calculator__operation-button">+</div>
+        <OperationButton operation="/" />
+        <OperationButton operation="*" />
+        <OperationButton operation="-" />
+        <OperationButton operation="+" />
       </div>
       <div className="calculator__row-3">
-        <div className="calculator__digit-button">7</div>
-        <div className="calculator__digit-button">8</div>
-        <div className="calculator__digit-button">9</div>
-        <div className="calculator__digit-button">4</div>
-        <div className="calculator__digit-button">5</div>
-        <div className="calculator__digit-button">6</div>
-        <div className="calculator__digit-button">1</div>
-        <div className="calculator__digit-button">2</div>
-        <div className="calculator__digit-button">3</div>
-        <div className="calculator__digit-button zero">0</div>
-        <div className="calculator__digit-button">.</div>
+        <DigitButton digit="7" />
+        <DigitButton digit="8" />
+        <DigitButton digit="9" />
+        <DigitButton digit="4" />
+        <DigitButton digit="5" />
+        <DigitButton digit="6" />
+        <DigitButton digit="1" />
+        <DigitButton digit="2" />
+        <DigitButton digit="3" />
+        <DigitButton digit="0" />
+        <DigitButton digit="." />
+        <DigitButton digit="AC" clear />
       </div>
       <div className="calculator__row-4">
-        <button className="calculator__evaluate">=</button>
+        <button
+          className="calculator__evaluate"
+          onClick={() => dispatch(compute())}
+        >
+          =
+        </button>
       </div>
     </div>
   );
