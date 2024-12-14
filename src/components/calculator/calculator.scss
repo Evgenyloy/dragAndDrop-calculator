@@ -90,3 +90,13 @@
     }
   }
 }
+
+.drop-over {
+  transform: translateY(50px);
+}
+
+.disable {
+  opacity: 50%;
+  border: 1px rgb(224, 224, 224) solid;
+  cursor: default;
+}

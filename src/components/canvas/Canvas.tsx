@@ -1,62 +1,61 @@
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { IoConstructOutline } from 'react-icons/io5';
 import './canvas.scss';
-import { useAppSelector } from '../../hooks/hooks';
-import {
-  closestCenter,
-  DndContext,
-  DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  useDroppable,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import React, { useState } from 'react';
-import { IItems } from '../../types/types';
+import { IRow } from '../../types/types';
 import {
-  arrayMove,
-  horizontalListSortingStrategy,
-  rectSortingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-
+  rowCalculatorItems,
+  setCurrentRowId,
+} from '../../slice/dragAndDropSlice';
+// dragStart: пользователь начинает перетаскивание элемента.
+// dragEnter: перетаскиваемый элемент достигает конечного элемента.
+// dragOver: курсор мыши наведен на элемент при перетаскивании.
+// dragLeave: курсор мыши покидает пределы перетаскиваемого элемента.
+// drag: курсор двигается при перетаскивании.
+// drop: срабатывает на элементе на который бросают (на меня что то уронили) он не считывает упавший элемент
+// dragEnd: пользователь отпускает курсор мыши в процессе перетаскивания.
 interface ICanvasProps {
-  rows: IItems[];
-  items: string[];
-  handleDragEnd: (e: DragEndEvent) => void;
+  canvas: IRow[];
+  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>;
 }
 
-function Canvas({ rows, items, handleDragEnd }: ICanvasProps) {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+function Canvas({ canvas, setCanvas }: ICanvasProps) {
+  const currentRowId = useAppSelector(
+    (state) => state.dragAndDrop.currentRowId
   );
-  const currentRow = useAppSelector((state) => state.dragAndDrop.currentRow);
-  //isOver- показывает над контейнером ли сейчас перетаскиваемый элемент
 
-  const { setNodeRef: dropNodeRef } = useDroppable({
-    id: 'droppable',
-  });
-  const { setNodeRef } = useDroppable({
-    id: 'drop',
-  });
-
-  function Droppable(props: any) {
-    const { setNodeRef } = useDroppable({
-      id: props.id,
-    });
-
-    return (
-      <div className={`canvas__droppable-${props.id}`} ref={setNodeRef}>
-        {props.children}
-      </div>
-    );
+  const dispatch = useAppDispatch();
+  function handleDragStart(e: React.DragEvent<HTMLDivElement>) {
+    if (!(e.target instanceof HTMLElement)) return;
   }
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    if (canvas.length > 4) return;
+
+    if (canvas.some((e) => e.id === currentRowId)) return;
+    if (currentRowId) {
+      const row = rowCalculatorItems.filter((e) => {
+        return e.id === currentRowId;
+      });
+      if (row) {
+        setCanvas((oldRow) => [...oldRow, ...row]);
+      }
+    }
+  }
+
+  const sortCards = (a: any, b: any) => {
+    if (parseFloat(a.order) > parseFloat(b.order)) {
+      return 1;
+    } else {
+      return -1;
+    }
+  };
 
   return (
     <div className="field">
@@ -71,23 +70,29 @@ function Canvas({ rows, items, handleDragEnd }: ICanvasProps) {
         </div>
       </div>
 
-      <div className="canvas" id="canvas" /* ref={dropNodeRef} */>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={(e) => handleDragEnd(e)}
-        >
-          {/* rectSortingStrategy , verticalListSortingStrategy , horizontalListSortingStrategy*/}
-          <SortableContext strategy={verticalListSortingStrategy} items={items}>
-            {rows.map((item) => {
-              return (
-                <Droppable id={item.id} key={item.id}>
-                  <item.row refs="sort" />
-                </Droppable>
-              );
-            })}
-          </SortableContext>
-        </DndContext>
+      <div
+        className="canvas"
+        id="canvas"
+        /*   draggable */
+        onDragStart={handleDragStart}
+        onDragLeave={(e) => e}
+        onDragEnd={(e) => e}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        {canvas.sort(sortCards).map((item) => {
+          return (
+            <React.Fragment key={item.id}>
+              <item.row
+                canvas={canvas}
+                data={item.order}
+                setCanvas={setCanvas}
+                field={'canvas'}
+              />
+            </React.Fragment>
+          );
+        })}
+
         {/*  <div className="canvas__inner" >
           <IoImages className="canvas__icon" />
           <span className="canvas__text-1">Перетащите сюда</span>

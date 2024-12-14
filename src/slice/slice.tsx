@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { evaluate } from '../utils/utils';
+import { evaluate } from '../utils/calculatorUtils';
 
 interface IInitialState {
   currentOperand: string;

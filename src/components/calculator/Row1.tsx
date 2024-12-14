@@ -1,9 +1,22 @@
-import { useAppSelector } from '../../hooks/hooks';
-import { IRowProps } from '../../types/types';
-import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
+import { IRow } from '../../types/types';
+import {
+  classNameSwitcher,
+  dragSwitcher,
+  handleDragOver,
+  handleDragStart,
+  handleDrop,
+} from '../../utils/dragAndDropUtils';
 
-const Row1 = ({ refs }: IRowProps) => {
-  const currentRow = useAppSelector((state) => state.dragAndDrop.currentRow);
+export interface IRowProps {
+  canvas?: IRow[];
+  data: string;
+  setCanvas?: React.Dispatch<React.SetStateAction<IRow[]>>;
+  field: string;
+}
+
+const Row1 = ({ canvas, setCanvas, data, field }: IRowProps) => {
   const operation = useAppSelector((state) => state.calculator.operation);
   const currentOperand = useAppSelector(
     (state) => state.calculator.currentOperand
@@ -12,25 +25,46 @@ const Row1 = ({ refs }: IRowProps) => {
     (state) => state.calculator.previousOperand
   );
 
-  const {
-    dragNodeRef,
-    sortNodeRef,
-    attributes,
-    sortAttributes,
-    listeners,
-    sortListeners,
-    style,
-    sortStyle,
-    sortStyle2,
-  } = useDragAndDrop('1');
+  const dispatch = useAppDispatch();
+  const currentRowId = useAppSelector(
+    (state) => state.dragAndDrop.currentRowId
+  );
+  const CurrentRowOrder = useAppSelector(
+    (state) => state.dragAndDrop.CurrentRowOrder
+  );
+
+  const [disable, setDisable] = useState(true);
+  const [draggable, setDraggable] = useState(true);
+  const [className, setClassName] = useState(
+    'calculator__row calculator__row-1'
+  );
+
+  useEffect(() => {
+    document.querySelector('.calculator__row')?.id;
+    if (
+      canvas?.some(
+        (el) => el.id === document.querySelector('.calculator__row')?.id
+      )
+    ) {
+      setDisable(false);
+    }
+    classNameSwitcher(field, disable, setClassName);
+    dragSwitcher(field, disable, setDraggable);
+  }, [disable, canvas]);
 
   return (
     <div
-      className={`calculator__row-1 ${refs === 'drag' ? 'drag' : 'drop'}`}
-      ref={refs === 'drag' ? dragNodeRef : sortNodeRef}
-      style={refs === 'drag' ? style : sortStyle}
-      {...(refs === 'drag' ? { ...attributes } : { ...sortAttributes })}
-      {...(refs === 'drag' ? { ...listeners } : { ...sortListeners })}
+      className={className}
+      draggable={draggable}
+      onDragStart={(e) => handleDragStart(e, dispatch)}
+      onDragLeave={(e) => e}
+      onDragEnd={(e) => e}
+      onDragOver={handleDragOver}
+      onDrop={(e) =>
+        handleDrop(e, setCanvas, canvas, currentRowId, CurrentRowOrder)
+      }
+      id="1"
+      data-order={data}
     >
       <div className="calculator__output">
         <div className="calculator__previous-operand">

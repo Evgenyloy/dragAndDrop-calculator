@@ -1,31 +1,24 @@
 import { rowCalculatorItems } from '../../slice/dragAndDropSlice';
+import { IRow } from '../../types/types';
 import './calculator.scss';
 import React from 'react';
 
 interface ICalculatorProps {
-  itemsArr: {
-    id: string;
-    row: JSX.Element;
-    order: number;
-  }[];
-  setItemsArr: React.Dispatch<
-    React.SetStateAction<
-      {
-        id: string;
-        row: JSX.Element;
-        order: number;
-      }[]
-    >
-  >;
+  canvas: IRow[];
+  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>;
 }
-
-function Calculator() {
+function Calculator({ canvas, setCanvas }: ICalculatorProps) {
   return (
     <div className="calculator">
       {rowCalculatorItems.map((item) => {
         return (
           <React.Fragment key={item.id}>
-            <item.row refs="drag" />
+            <item.row
+              canvas={canvas}
+              data={item.order}
+              setCanvas={setCanvas}
+              field={'calculator'}
+            />
           </React.Fragment>
         );
       })}
