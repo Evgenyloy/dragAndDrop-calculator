@@ -16,6 +16,8 @@
   border-radius: 5px;
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
   width: 100%;
+  &:not(:last-child) {
+    margin-bottom: 16px;
+  }
 }

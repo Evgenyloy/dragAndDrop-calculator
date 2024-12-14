@@ -20,6 +20,7 @@ const slice = createSlice({
   initialState,
   reducers: {
     addDigit: (state, action: PayloadAction<string>) => {
+      if (state.currentOperand.length > 13 && !state.overwrite) return;
       if (action.payload === '0' && state.currentOperand === '0') {
         return;
       }
@@ -41,6 +42,7 @@ const slice = createSlice({
       state.operation = '';
     },
     addOperation: (state, action: PayloadAction<string>) => {
+      // if (state.operation) return;
       if (!state.currentOperand && !state.previousOperand) {
         return state;
       }

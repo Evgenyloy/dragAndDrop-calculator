@@ -1,0 +1,97 @@
+.field {
+  position: relative;
+}
+
+.buttons {
+  position: absolute;
+  width: 100%;
+  top: -70px;
+  background-color: #f3f4f6;
+  border-radius: 5px;
+  display: flex;
+  height: 38px;
+  padding: 1px 2px;
+
+  &__icon {
+  }
+  &__item {
+    height: 90%;
+    margin: auto 0;
+    flex: 1 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  &__item-1 {
+    background-color: #f3f4f6;
+  }
+  &__button {
+    border: none;
+    padding: 3px 10px;
+  }
+}
+
+.canvas {
+  width: 239px;
+  height: 493px;
+  border: 2px dashed rgb(196, 196, 196);
+  border-radius: 6px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-direction: column;
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__icon {
+    fill: rgb(107, 114, 128);
+    width: 20px;
+    height: 20px;
+    margin-bottom: 10px;
+  }
+
+  &__text-1 {
+    text-transform: uppercase;
+    color: rgb(93, 95, 239);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  &__text-2 {
+    color: rgb(107, 114, 128);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+    text-align: center;
+  }
+  &__droppable-1 {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 16px;
+  }
+  &__droppable-2 {
+    width: 100%;
+    height: 56px;
+    margin-bottom: 16px;
+  }
+  &__droppable-3 {
+    width: 100%;
+    height: 241px;
+    margin-bottom: 16px;
+  }
+  &__droppable-4 {
+    width: 100%;
+    height: 72px;
+    margin-bottom: 16px;
+  }
+}
