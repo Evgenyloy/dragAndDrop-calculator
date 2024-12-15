@@ -1,53 +1,29 @@
-import { useDraggable } from '@dnd-kit/core';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { useEffect, useState } from 'react';
+import { classNameSwitcher, dragSwitcher } from '../utils/dragAndDropUtils';
+import { IRow } from '../types/types';
 
-export const useDragAndDrop = (id: string) => {
-  const {
-    setNodeRef: dragNodeRef,
-    attributes,
-    listeners,
-    transform,
-  } = useDraggable({
-    id: id,
-  });
+export function useDragAndDrop(
+  canvas: IRow[] | undefined,
+  field: string,
+  id: string
+) {
+  const [disable, setDisable] = useState(true);
+  const [draggable, setDraggable] = useState(true);
+  const [className, setClassName] = useState(
+    ` calculator__row calculator__row-${id}`
+  );
 
-  const {
-    setNodeRef: sortNodeRef,
-    attributes: sortAttributes,
-    listeners: sortListeners,
-    transform: sortTransform,
-    transition,
-  } = useSortable({
-    id: id,
-  });
+  useEffect(() => {
+    if (
+      canvas?.some(
+        (el) => el.id === document.querySelector(`[data-order='${id}']`)?.id
+      )
+    ) {
+      setDisable(false);
+    }
+    classNameSwitcher(field, disable, setClassName, id);
+    dragSwitcher(field, disable, setDraggable);
+  }, [disable, canvas]);
 
-  const sortStyle2 = {
-    '--translate-x': sortTransform ? sortTransform.x : 0,
-    '--translate-y': sortTransform ? sortTransform.y : 50,
-    '--transition': transition,
-  };
-
-  const style = {
-    transform: CSS.Translate.toString(transform),
-  };
-
-  const sortStyle = {
-    transform: CSS.Transform.toString(
-      sortTransform && { ...sortTransform, scaleY: 1 }
-    ),
-    transition,
-  };
-
-  return {
-    dragNodeRef,
-    sortNodeRef,
-    attributes,
-    sortAttributes,
-    listeners,
-    sortListeners,
-    style,
-    sortStyle,
-    sortStyle2,
-  };
-};
+  return { disable, draggable, className };
+}

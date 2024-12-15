@@ -1,5 +1,5 @@
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
-import { IoConstructOutline } from 'react-icons/io5';
+import { IoConstructOutline, IoImages } from 'react-icons/io5';
 import './canvas.scss';
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import React, { useState } from 'react';
@@ -31,7 +31,9 @@ function Canvas({ canvas, setCanvas }: ICanvasProps) {
   }
 
   function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    if (!(e.target instanceof HTMLElement)) return;
     e.preventDefault();
+    // e.target.style.background = 'grey';
   }
 
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -58,7 +60,11 @@ function Canvas({ canvas, setCanvas }: ICanvasProps) {
   };
 
   return (
-    <div className="field">
+    <div
+      className={
+        currentRowId && canvas.length === 0 ? 'field drag-start' : 'field'
+      }
+    >
       <div className="buttons">
         <div className="buttons__item buttons__item-1">
           <MdOutlineRemoveRedEye className="buttons__icon" />
@@ -80,7 +86,7 @@ function Canvas({ canvas, setCanvas }: ICanvasProps) {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        {canvas.sort(sortCards).map((item) => {
+        {canvas.sort(/* sortCards */).map((item) => {
           return (
             <React.Fragment key={item.id}>
               <item.row
@@ -92,14 +98,15 @@ function Canvas({ canvas, setCanvas }: ICanvasProps) {
             </React.Fragment>
           );
         })}
-
-        {/*  <div className="canvas__inner" >
-          <IoImages className="canvas__icon" />
-          <span className="canvas__text-1">Перетащите сюда</span>
-          <span className="canvas__text-2">
-            любой элемент <br /> из левой панели
-          </span>
-        </div> */}
+        {!canvas.length && (
+          <div className="canvas__inner">
+            <IoImages className="canvas__icon" />
+            <span className="canvas__text-1">Перетащите сюда</span>
+            <span className="canvas__text-2">
+              любой элемент <br /> из левой панели
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

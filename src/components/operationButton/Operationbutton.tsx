@@ -5,11 +5,11 @@ import { IOperationButtonProps } from '../../types/types';
 export default function OperationButton({ operation }: IOperationButtonProps) {
   const dispatch = useAppDispatch();
   return (
-    <button
+    <div
       className="calculator__operation-button"
-      onClick={() => dispatch(addOperation(operation))}
+      onClick={() => dispatch(addOperation(operation as string))}
     >
       {operation}
-    </button>
+    </div>
   );
 }

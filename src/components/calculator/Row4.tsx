@@ -2,10 +2,14 @@ import { compute } from '../../slice/slice';
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import { IRowProps } from './Row1';
 import {
+  handleDragEnd,
+  handleDragLeave,
   handleDragOver,
   handleDragStart,
   handleDrop,
 } from '../../utils/dragAndDropUtils';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { useState } from 'react';
 
 function Row4({ canvas, setCanvas, data, field }: IRowProps) {
   const dispatch = useAppDispatch();
@@ -16,26 +20,32 @@ function Row4({ canvas, setCanvas, data, field }: IRowProps) {
     (state) => state.dragAndDrop.CurrentRowOrder
   );
 
+  const { className, disable, draggable } = useDragAndDrop(canvas, field, '4');
+  const [dragOverClass, setDragOverClass] = useState('');
   return (
     <div
-      className={`calculator__row calculator__row-4 `}
-      draggable
+      className={className + ' ' + dragOverClass}
+      draggable={draggable}
       onDragStart={(e) => handleDragStart(e, dispatch)}
-      onDragLeave={(e) => e}
-      onDragEnd={(e) => e}
-      onDragOver={handleDragOver}
+      onDragLeave={(e) => handleDragLeave(e, field, setDragOverClass)}
+      onDragEnd={(e) => handleDragEnd(e, field, setDragOverClass)}
+      onDragOver={(e) => handleDragOver(e, field, '1', setDragOverClass)}
       onDrop={(e) =>
-        handleDrop(e, setCanvas, canvas, currentRowId, CurrentRowOrder)
+        handleDrop(
+          e,
+          setCanvas,
+          canvas,
+          currentRowId,
+          CurrentRowOrder,
+          setDragOverClass
+        )
       }
       id="4"
       data-order={data}
     >
-      <button
-        className="calculator__evaluate"
-        onClick={() => dispatch(compute())}
-      >
+      <div className="calculator__evaluate" onClick={() => dispatch(compute())}>
         =
-      </button>
+      </div>
     </div>
   );
 }

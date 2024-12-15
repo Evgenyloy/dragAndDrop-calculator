@@ -17,9 +17,19 @@ export function handleDragStart(
   );
 }
 
-export function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+export function handleDragOver(
+  e: React.DragEvent<HTMLDivElement>,
+  field: string,
+  id: string,
+  setDragOverClass: React.Dispatch<React.SetStateAction<string>>
+) {
   if (!(e.target instanceof HTMLElement)) return;
   e.preventDefault();
+  if (field === 'canvas') {
+    if (!e.currentTarget.contains(e.relatedTarget as HTMLElement)) {
+      setDragOverClass('drop-over');
+    }
+  }
 }
 
 export function handleDrop(
@@ -27,48 +37,84 @@ export function handleDrop(
   setCanvas: React.Dispatch<React.SetStateAction<IRow[]>> | undefined,
   canvas: IRow[] | undefined,
   currentRowId: string,
-  CurrentRowOrder: string
+  CurrentRowOrder: string,
+  setDragOverClass: React.Dispatch<React.SetStateAction<string>>
 ) {
   if (!(e.target instanceof HTMLElement)) return;
   e.preventDefault();
 
+  /*   function swap(arr, a, b) {
+    arr[a] = arr.splice(b, 1, arr[a])[0];
+  } */
+
   if (setCanvas && canvas) {
     setCanvas(
-      canvas?.map((c) => {
-        if (!(e.target instanceof HTMLElement)) return c;
-        if (c.id === e.target.closest('.calculator__row')?.id) {
+      canvas?.map((row) => {
+        if (!(e.target instanceof HTMLElement)) return row;
+        //-------------------------------------------------------------------------------------------------------------
+
+        if (
+          row.id === e.target.closest('.calculator__row')?.id &&
+          canvas.some((e) => e.id === currentRowId)
+        ) {
           return {
-            ...c,
+            ...row,
             order: CurrentRowOrder,
           };
         }
-        if (c.id === currentRowId) {
+        if (row.id === currentRowId) {
+          console.log(e.target?.closest('.calculator__row'));
+
           return {
-            ...c,
+            ...row,
             order: (e.target?.closest('.calculator__row') as HTMLElement)
               ?.dataset?.order as string,
           };
         }
-        return c;
+        return row;
       })
     );
   }
+  if (!e.currentTarget.contains(e.relatedTarget as HTMLElement)) {
+    setDragOverClass('');
+  }
 }
 
-function handleDragEnd(event: React.DragEvent<HTMLDivElement>) {
+export function handleDragEnd(
+  event: React.DragEvent<HTMLDivElement>,
+  field: string,
+  setDragOverClass: React.Dispatch<React.SetStateAction<string>>
+) {
   if (!(event.target instanceof HTMLElement)) return;
+
+  if (!event.currentTarget.contains(event.relatedTarget as HTMLElement)) {
+    setDragOverClass('');
+  }
+}
+
+export function handleDragLeave(
+  event: React.DragEvent<HTMLDivElement>,
+  field: string,
+  setDragOverClass: React.Dispatch<React.SetStateAction<string>>
+) {
+  if (!(event.target instanceof HTMLElement)) return;
+
+  if (!event.currentTarget.contains(event.relatedTarget as HTMLElement)) {
+    setDragOverClass('');
+  }
 }
 
 export function classNameSwitcher(
   field: string,
   disable: boolean,
-  setClassName: React.Dispatch<React.SetStateAction<string>>
+  setClassName: React.Dispatch<React.SetStateAction<string>>,
+  id: string
 ) {
   if (field === 'calculator' && disable) {
-    setClassName('calculator__row calculator__row-1');
+    setClassName(`calculator__row calculator__row-${id}`);
   }
   if (field === 'calculator' && disable === false) {
-    setClassName('calculator__row calculator__row-1  disable');
+    setClassName(`calculator__row calculator__row-${id}  disable`);
   }
 }
 

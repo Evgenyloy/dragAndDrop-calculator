@@ -5,11 +5,11 @@ import { IDigitButtonProps } from '../../types/types';
 export default function DigitButton({ digit, clear }: IDigitButtonProps) {
   const dispatch = useAppDispatch();
   return (
-    <button
+    <div
       className="calculator__digit-button"
       onClick={() => dispatch(clear ? allClear() : addDigit(digit))}
     >
       {digit}
-    </button>
+    </div>
   );
 }

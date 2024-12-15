@@ -4,10 +4,13 @@ import { IRow } from '../../types/types';
 import {
   classNameSwitcher,
   dragSwitcher,
+  handleDragEnd,
+  handleDragLeave,
   handleDragOver,
   handleDragStart,
   handleDrop,
 } from '../../utils/dragAndDropUtils';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 
 export interface IRowProps {
   canvas?: IRow[];
@@ -33,35 +36,26 @@ const Row1 = ({ canvas, setCanvas, data, field }: IRowProps) => {
     (state) => state.dragAndDrop.CurrentRowOrder
   );
 
-  const [disable, setDisable] = useState(true);
-  const [draggable, setDraggable] = useState(true);
-  const [className, setClassName] = useState(
-    'calculator__row calculator__row-1'
-  );
-
-  useEffect(() => {
-    document.querySelector('.calculator__row')?.id;
-    if (
-      canvas?.some(
-        (el) => el.id === document.querySelector('.calculator__row')?.id
-      )
-    ) {
-      setDisable(false);
-    }
-    classNameSwitcher(field, disable, setClassName);
-    dragSwitcher(field, disable, setDraggable);
-  }, [disable, canvas]);
-
+  const { className, disable, draggable } = useDragAndDrop(canvas, field, '1');
+  const [dragOverClass, setDragOverClass] = useState('');
+  //сделать состояние для фона и раскинуть его по функциям
   return (
     <div
-      className={className}
+      className={className + ' ' + dragOverClass}
       draggable={draggable}
       onDragStart={(e) => handleDragStart(e, dispatch)}
-      onDragLeave={(e) => e}
-      onDragEnd={(e) => e}
-      onDragOver={handleDragOver}
+      onDragLeave={(e) => handleDragLeave(e, field, setDragOverClass)}
+      onDragEnd={(e) => handleDragEnd(e, field, setDragOverClass)}
+      onDragOver={(e) => handleDragOver(e, field, '1', setDragOverClass)}
       onDrop={(e) =>
-        handleDrop(e, setCanvas, canvas, currentRowId, CurrentRowOrder)
+        handleDrop(
+          e,
+          setCanvas,
+          canvas,
+          currentRowId,
+          CurrentRowOrder,
+          setDragOverClass
+        )
       }
       id="1"
       data-order={data}
