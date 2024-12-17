@@ -1,4 +1,4 @@
-import { useAppDispatch } from '../../hooks/hooks';
+import { useAppDispatch } from '../../hooks/useReduxHooks';
 import { addDigit, allClear } from '../../slice/slice';
 import { IDigitButtonProps } from '../../types/types';
 

@@ -1,25 +1,17 @@
-import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
-import { IRow } from '../../types/types';
+import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks/useReduxHooks';
+import { IRow, IRowProps } from '../../types/types';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 import {
-  classNameSwitcher,
-  dragSwitcher,
   handleDragEnd,
   handleDragLeave,
   handleDragOver,
   handleDragStart,
   handleDrop,
 } from '../../utils/dragAndDropUtils';
-import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { useSwapRows } from '../../hooks/useSwapRows';
 
-export interface IRowProps {
-  canvas?: IRow[];
-  data: string;
-  setCanvas?: React.Dispatch<React.SetStateAction<IRow[]>>;
-  field: string;
-}
-
-const Row1 = ({ canvas, setCanvas, data, field }: IRowProps) => {
+const Row1 = ({ canvas, setCanvas, field }: IRowProps) => {
   const operation = useAppSelector((state) => state.calculator.operation);
   const currentOperand = useAppSelector(
     (state) => state.calculator.currentOperand
@@ -27,22 +19,22 @@ const Row1 = ({ canvas, setCanvas, data, field }: IRowProps) => {
   const previousOperand = useAppSelector(
     (state) => state.calculator.previousOperand
   );
-
   const dispatch = useAppDispatch();
   const currentRowId = useAppSelector(
     (state) => state.dragAndDrop.currentRowId
   );
-  const CurrentRowOrder = useAppSelector(
-    (state) => state.dragAndDrop.CurrentRowOrder
-  );
-
-  const { className, disable, draggable } = useDragAndDrop(canvas, field, '1');
+  const runTime = useAppSelector((state) => state.calculator.runTime);
   const [dragOverClass, setDragOverClass] = useState('');
-  //сделать состояние для фона и раскинуть его по функциям
+
+  const { className, draggable } = useDragAndDrop(canvas, field, '1');
+
+  const { setCurrentRow, setCurrentRowIndex, setLyingRow, setLyingRowIndex } =
+    useSwapRows(setCanvas, canvas as IRow[], currentRowId);
+
   return (
     <div
       className={className + ' ' + dragOverClass}
-      draggable={draggable}
+      draggable={runTime ? false : draggable}
       onDragStart={(e) => handleDragStart(e, dispatch)}
       onDragLeave={(e) => handleDragLeave(e, field, setDragOverClass)}
       onDragEnd={(e) => handleDragEnd(e, field, setDragOverClass)}
@@ -50,15 +42,16 @@ const Row1 = ({ canvas, setCanvas, data, field }: IRowProps) => {
       onDrop={(e) =>
         handleDrop(
           e,
-          setCanvas,
           canvas,
           currentRowId,
-          CurrentRowOrder,
-          setDragOverClass
+          setDragOverClass,
+          setCurrentRow,
+          setCurrentRowIndex,
+          setLyingRow,
+          setLyingRowIndex
         )
       }
       id="1"
-      data-order={data}
     >
       <div className="calculator__output">
         <div className="calculator__previous-operand">

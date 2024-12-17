@@ -1,6 +1,8 @@
+import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks/useReduxHooks';
+import { IRow, IRowProps } from '../../types/types';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 import { compute } from '../../slice/slice';
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
-import { IRowProps } from './Row1';
 import {
   handleDragEnd,
   handleDragLeave,
@@ -8,24 +10,24 @@ import {
   handleDragStart,
   handleDrop,
 } from '../../utils/dragAndDropUtils';
-import { useDragAndDrop } from '../../hooks/useDragAndDrop';
-import { useState } from 'react';
+import { useSwapRows } from '../../hooks/useSwapRows';
 
-function Row4({ canvas, setCanvas, data, field }: IRowProps) {
+function Row4({ canvas, setCanvas, field }: IRowProps) {
   const dispatch = useAppDispatch();
   const currentRowId = useAppSelector(
     (state) => state.dragAndDrop.currentRowId
   );
-  const CurrentRowOrder = useAppSelector(
-    (state) => state.dragAndDrop.CurrentRowOrder
-  );
-
-  const { className, disable, draggable } = useDragAndDrop(canvas, field, '4');
+  const runTime = useAppSelector((state) => state.calculator.runTime);
+  const { className, draggable } = useDragAndDrop(canvas, field, '4');
   const [dragOverClass, setDragOverClass] = useState('');
+
+  const { setCurrentRow, setCurrentRowIndex, setLyingRow, setLyingRowIndex } =
+    useSwapRows(setCanvas, canvas as IRow[], currentRowId);
+
   return (
     <div
       className={className + ' ' + dragOverClass}
-      draggable={draggable}
+      draggable={runTime ? false : draggable}
       onDragStart={(e) => handleDragStart(e, dispatch)}
       onDragLeave={(e) => handleDragLeave(e, field, setDragOverClass)}
       onDragEnd={(e) => handleDragEnd(e, field, setDragOverClass)}
@@ -33,15 +35,16 @@ function Row4({ canvas, setCanvas, data, field }: IRowProps) {
       onDrop={(e) =>
         handleDrop(
           e,
-          setCanvas,
           canvas,
           currentRowId,
-          CurrentRowOrder,
-          setDragOverClass
+          setDragOverClass,
+          setCurrentRow,
+          setCurrentRowIndex,
+          setLyingRow,
+          setLyingRowIndex
         )
       }
       id="4"
-      data-order={data}
     >
       <div className="calculator__evaluate" onClick={() => dispatch(compute())}>
         =

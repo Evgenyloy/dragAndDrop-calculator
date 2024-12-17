@@ -1,3 +1,4 @@
+import { useAppSelector } from '../../hooks/useReduxHooks';
 import { rowCalculatorItems } from '../../slice/dragAndDropSlice';
 import { IRow } from '../../types/types';
 import './calculator.scss';
@@ -15,7 +16,6 @@ function Calculator({ canvas, setCanvas }: ICalculatorProps) {
           <React.Fragment key={item.id}>
             <item.row
               canvas={canvas}
-              data={item.order}
               setCanvas={setCanvas}
               field={'calculator'}
             />

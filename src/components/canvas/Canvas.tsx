@@ -1,20 +1,12 @@
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { IoConstructOutline, IoImages } from 'react-icons/io5';
-import './canvas.scss';
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
-import React, { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks/useReduxHooks';
+import React from 'react';
 import { IRow } from '../../types/types';
-import {
-  rowCalculatorItems,
-  setCurrentRowId,
-} from '../../slice/dragAndDropSlice';
-// dragStart: пользователь начинает перетаскивание элемента.
-// dragEnter: перетаскиваемый элемент достигает конечного элемента.
-// dragOver: курсор мыши наведен на элемент при перетаскивании.
-// dragLeave: курсор мыши покидает пределы перетаскиваемого элемента.
-// drag: курсор двигается при перетаскивании.
-// drop: срабатывает на элементе на который бросают (на меня что то уронили) он не считывает упавший элемент
-// dragEnd: пользователь отпускает курсор мыши в процессе перетаскивания.
+import { rowCalculatorItems } from '../../slice/dragAndDropSlice';
+import { setRunTime } from '../../slice/slice';
+import './canvas.scss';
+
 interface ICanvasProps {
   canvas: IRow[];
   setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>;
@@ -24,40 +16,21 @@ function Canvas({ canvas, setCanvas }: ICanvasProps) {
   const currentRowId = useAppSelector(
     (state) => state.dragAndDrop.currentRowId
   );
-
+  const runTime = useAppSelector((state) => state.calculator.runTime);
   const dispatch = useAppDispatch();
-  function handleDragStart(e: React.DragEvent<HTMLDivElement>) {
-    if (!(e.target instanceof HTMLElement)) return;
-  }
-
-  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
-    if (!(e.target instanceof HTMLElement)) return;
-    e.preventDefault();
-    // e.target.style.background = 'grey';
-  }
-
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
+    if ((e.target as HTMLElement)?.closest('.calculator__row')) return;
     if (canvas.length > 4) return;
+    if (canvas.some((e) => e?.id === currentRowId)) return;
 
-    if (canvas.some((e) => e.id === currentRowId)) return;
     if (currentRowId) {
-      const row = rowCalculatorItems.filter((e) => {
+      const newRow = rowCalculatorItems.filter((e) => {
         return e.id === currentRowId;
       });
-      if (row) {
-        setCanvas((oldRow) => [...oldRow, ...row]);
-      }
+      setCanvas((oldRow) => [...oldRow, ...newRow]);
     }
   }
-
-  const sortCards = (a: any, b: any) => {
-    if (parseFloat(a.order) > parseFloat(b.order)) {
-      return 1;
-    } else {
-      return -1;
-    }
-  };
 
   return (
     <div
@@ -66,11 +39,25 @@ function Canvas({ canvas, setCanvas }: ICanvasProps) {
       }
     >
       <div className="buttons">
-        <div className="buttons__item buttons__item-1">
+        <div
+          className={
+            runTime
+              ? 'buttons__item buttons__item-1 buttons__active'
+              : 'buttons__item buttons__item-1'
+          }
+          onClick={() => dispatch(setRunTime(true))}
+        >
           <MdOutlineRemoveRedEye className="buttons__icon" />
           <div className="buttons__button">Runtime</div>
         </div>
-        <div className="buttons__item buttons__item-2">
+        <div
+          className={
+            runTime
+              ? 'buttons__item buttons__item-2'
+              : 'buttons__item buttons__item-2 buttons__active'
+          }
+          onClick={() => dispatch(setRunTime(false))}
+        >
           <IoConstructOutline className="buttons__icon" />
           <div className="buttons__button">Constructor</div>
         </div>
@@ -79,19 +66,15 @@ function Canvas({ canvas, setCanvas }: ICanvasProps) {
       <div
         className="canvas"
         id="canvas"
-        /*   draggable */
-        onDragStart={handleDragStart}
-        onDragLeave={(e) => e}
-        onDragEnd={(e) => e}
-        onDragOver={handleDragOver}
+        onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >
-        {canvas.sort(/* sortCards */).map((item) => {
+        {canvas.map((item) => {
+          if (!item) return;
           return (
             <React.Fragment key={item.id}>
               <item.row
                 canvas={canvas}
-                data={item.order}
                 setCanvas={setCanvas}
                 field={'canvas'}
               />

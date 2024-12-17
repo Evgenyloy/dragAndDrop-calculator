@@ -1,4 +1,4 @@
-import { useAppDispatch } from '../../hooks/hooks';
+import { useAppDispatch } from '../../hooks/useReduxHooks';
 import { addOperation } from '../../slice/slice';
 import { IOperationButtonProps } from '../../types/types';
 

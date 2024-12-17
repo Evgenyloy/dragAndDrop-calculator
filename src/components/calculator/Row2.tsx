@@ -1,10 +1,8 @@
+import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks/useReduxHooks';
+import { IRow, IRowProps } from '../../types/types';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 import OperationButton from '../operationButton/Operationbutton';
-import {
-  setCurrentRowOrder,
-  setCurrentRowId,
-} from '../../slice/dragAndDropSlice';
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
-import { IRow } from '../../types/types';
 import {
   handleDragEnd,
   handleDragLeave,
@@ -12,30 +10,24 @@ import {
   handleDragStart,
   handleDrop,
 } from '../../utils/dragAndDropUtils';
-import { useDragAndDrop } from '../../hooks/useDragAndDrop';
-import { useState } from 'react';
-export interface IRowProps {
-  canvas?: IRow[];
-  data: string;
-  setCanvas?: React.Dispatch<React.SetStateAction<IRow[]>>;
-  field: string;
-}
+import { useSwapRows } from '../../hooks/useSwapRows';
 
-function Row2({ canvas, setCanvas, data, field }: IRowProps) {
+function Row2({ canvas, setCanvas, field }: IRowProps) {
   const dispatch = useAppDispatch();
   const currentRowId = useAppSelector(
     (state) => state.dragAndDrop.currentRowId
   );
-  const CurrentRowOrder = useAppSelector(
-    (state) => state.dragAndDrop.CurrentRowOrder
-  );
-
-  const { className, disable, draggable } = useDragAndDrop(canvas, field, '2');
+  const runTime = useAppSelector((state) => state.calculator.runTime);
+  const { className, draggable } = useDragAndDrop(canvas, field, '2');
   const [dragOverClass, setDragOverClass] = useState('');
+
+  const { setCurrentRow, setCurrentRowIndex, setLyingRow, setLyingRowIndex } =
+    useSwapRows(setCanvas, canvas as IRow[], currentRowId);
+
   return (
     <div
       className={className + ' ' + dragOverClass}
-      draggable={draggable}
+      draggable={runTime ? false : draggable}
       onDragStart={(e) => handleDragStart(e, dispatch)}
       onDragLeave={(e) => handleDragLeave(e, field, setDragOverClass)}
       onDragEnd={(e) => handleDragEnd(e, field, setDragOverClass)}
@@ -43,15 +35,16 @@ function Row2({ canvas, setCanvas, data, field }: IRowProps) {
       onDrop={(e) =>
         handleDrop(
           e,
-          setCanvas,
           canvas,
           currentRowId,
-          CurrentRowOrder,
-          setDragOverClass
+          setDragOverClass,
+          setCurrentRow,
+          setCurrentRowIndex,
+          setLyingRow,
+          setLyingRowIndex
         )
       }
       id="2"
-      data-order={data}
     >
       <OperationButton operation="/" />
       <OperationButton operation="*" />

@@ -6,6 +6,7 @@ interface IInitialState {
   previousOperand: string;
   operation: string;
   overwrite: boolean;
+  runTime: boolean;
 }
 
 const initialState: IInitialState = {
@@ -13,6 +14,7 @@ const initialState: IInitialState = {
   previousOperand: '',
   operation: '',
   overwrite: false,
+  runTime: true,
 };
 
 const slice = createSlice({
@@ -20,6 +22,7 @@ const slice = createSlice({
   initialState,
   reducers: {
     addDigit: (state, action: PayloadAction<string>) => {
+      if (!state.runTime) return;
       if (state.currentOperand.length > 13 && !state.overwrite) return;
       if (action.payload === '0' && state.currentOperand === '0') {
         return;
@@ -37,11 +40,13 @@ const slice = createSlice({
       }
     },
     allClear: (state) => {
+      if (!state.runTime) return;
       state.currentOperand = '';
       state.previousOperand = '';
       state.operation = '';
     },
     addOperation: (state, action: PayloadAction<string>) => {
+      if (!state.runTime) return;
       // if (state.operation) return;
       if (!state.currentOperand && !state.previousOperand) {
         return state;
@@ -61,6 +66,7 @@ const slice = createSlice({
       }
     },
     compute: (state) => {
+      if (!state.runTime) return;
       if (!state.operation || !state.currentOperand || !state.previousOperand) {
         return;
       }
@@ -69,9 +75,13 @@ const slice = createSlice({
       state.previousOperand = '';
       state.operation = '';
     },
+    setRunTime: (state, action: PayloadAction<boolean>) => {
+      state.runTime = action.payload;
+    },
   },
 });
 
 const { reducer, actions } = slice;
 export default reducer;
-export const { addDigit, allClear, addOperation, compute } = actions;
+export const { addDigit, allClear, addOperation, compute, setRunTime } =
+  actions;
