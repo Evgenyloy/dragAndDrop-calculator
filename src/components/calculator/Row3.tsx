@@ -1,9 +1,10 @@
 import DigitButton from '../digitButton/DigitButton';
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/useReduxHooks';
-import { IRow, IRowProps } from '../../types/types';
+import { IRowProps } from '../../types/types';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 import {
+  disableChecker,
+  handleDoubleClick,
   handleDragEnd,
   handleDragLeave,
   handleDragOver,
@@ -11,27 +12,25 @@ import {
   handleDrop,
 } from '../../utils/dragAndDropUtils';
 import { useSwapRows } from '../../hooks/useSwapRows';
+import { useOperation } from '../../hooks/useOperation';
 
 function Row3({ canvas, setCanvas, field }: IRowProps) {
-  const dispatch = useAppDispatch();
-  const currentRowId = useAppSelector(
-    (state) => state.dragAndDrop.currentRowId
-  );
-  const runTime = useAppSelector((state) => state.calculator.runTime);
-  const { className, draggable } = useDragAndDrop(canvas, field, '3');
   const [dragOverClass, setDragOverClass] = useState('');
-
+  const [dragStartClass, setDragStartClass] = useState('');
+  const { currentRowId, runTime, dispatch } = useOperation();
+  const { className, draggable } = useDragAndDrop(canvas, field, '3');
   const { setCurrentRow, setCurrentRowIndex, setLyingRow, setLyingRowIndex } =
-    useSwapRows(setCanvas, canvas as IRow[], currentRowId);
+    useSwapRows(setCanvas, canvas, currentRowId, field);
+  const disableCheck = disableChecker(className, '3');
 
   return (
     <div
-      className={className + ' ' + dragOverClass}
+      className={className + ' ' + dragOverClass + ' ' + dragStartClass}
       draggable={runTime ? false : draggable}
-      onDragStart={(e) => handleDragStart(e, dispatch)}
-      onDragLeave={(e) => handleDragLeave(e, field, setDragOverClass)}
-      onDragEnd={(e) => handleDragEnd(e, field, setDragOverClass)}
-      onDragOver={(e) => handleDragOver(e, field, '1', setDragOverClass)}
+      onDragStart={(e) => handleDragStart(e, dispatch, setDragStartClass)}
+      onDragLeave={(e) => handleDragLeave(e, setDragOverClass)}
+      onDragEnd={(e) => handleDragEnd(e, setDragOverClass, setDragStartClass)}
+      onDragOver={(e) => handleDragOver(e, field, setDragOverClass)}
       onDrop={(e) =>
         handleDrop(
           e,
@@ -41,23 +40,29 @@ function Row3({ canvas, setCanvas, field }: IRowProps) {
           setCurrentRow,
           setCurrentRowIndex,
           setLyingRow,
-          setLyingRowIndex
+          setLyingRowIndex,
+          disableCheck
         )
+      }
+      onDoubleClick={
+        disableCheck
+          ? undefined
+          : (e) => handleDoubleClick(e, setCanvas, canvas, runTime)
       }
       id="3"
     >
-      <DigitButton digit="7" />
-      <DigitButton digit="8" />
-      <DigitButton digit="9" />
-      <DigitButton digit="4" />
-      <DigitButton digit="5" />
-      <DigitButton digit="6" />
-      <DigitButton digit="1" />
-      <DigitButton digit="2" />
-      <DigitButton digit="3" />
-      <DigitButton digit="0" />
-      <DigitButton digit="." />
-      <DigitButton digit="AC" clear />
+      <DigitButton digit="7" disableCheck={disableCheck} />
+      <DigitButton digit="8" disableCheck={disableCheck} />
+      <DigitButton digit="9" disableCheck={disableCheck} />
+      <DigitButton digit="4" disableCheck={disableCheck} />
+      <DigitButton digit="5" disableCheck={disableCheck} />
+      <DigitButton digit="6" disableCheck={disableCheck} />
+      <DigitButton digit="1" disableCheck={disableCheck} />
+      <DigitButton digit="2" disableCheck={disableCheck} />
+      <DigitButton digit="3" disableCheck={disableCheck} />
+      <DigitButton digit="0" disableCheck={disableCheck} />
+      <DigitButton digit="." disableCheck={disableCheck} />
+      <DigitButton digit="AC" clear disableCheck={disableCheck} />
     </div>
   );
 }

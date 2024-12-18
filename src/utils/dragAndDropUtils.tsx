@@ -1,21 +1,19 @@
-import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks/useReduxHooks';
 import { rowCalculatorItems, setCurrentRowId } from '../slice/dragAndDropSlice';
 import { AppDispatch, IRow } from '../types/types';
 
 export function handleDragStart(
   e: React.DragEvent<HTMLDivElement>,
-  dispatch: AppDispatch
+  dispatch: AppDispatch,
+  setDragStartClass: React.Dispatch<React.SetStateAction<string>>
 ) {
   if (!(e.target instanceof HTMLElement)) return;
-
   dispatch(setCurrentRowId(e.target.id));
+  setDragStartClass('drag-start');
 }
 
 export function handleDragOver(
   e: React.DragEvent<HTMLDivElement>,
   field: string,
-  id: string,
   setDragOverClass: React.Dispatch<React.SetStateAction<string>>
 ) {
   if (!(e.target instanceof HTMLElement)) return;
@@ -35,8 +33,10 @@ export function handleDrop(
   setCurrentRow: React.Dispatch<React.SetStateAction<IRow | undefined>>,
   setCurrentRowIndex: React.Dispatch<React.SetStateAction<number | null>>,
   setLyingRow: React.Dispatch<React.SetStateAction<IRow | undefined>>,
-  setLyingRowIndex: React.Dispatch<React.SetStateAction<number | null>>
+  setLyingRowIndex: React.Dispatch<React.SetStateAction<number | null>>,
+  disableCheck: boolean
 ) {
+  if (disableCheck) return;
   if (!(e.target instanceof HTMLElement)) return;
   e.preventDefault();
   const rowOnCanvasId = (e.target?.closest('.calculator__row') as HTMLElement)
@@ -71,7 +71,19 @@ export function handleDrop(
 
 export function handleDragEnd(
   event: React.DragEvent<HTMLDivElement>,
-  field: string,
+  setDragOverClass: React.Dispatch<React.SetStateAction<string>>,
+  setDragStartClass: React.Dispatch<React.SetStateAction<string>>
+) {
+  if (!(event.target instanceof HTMLElement)) return;
+
+  if (!event.currentTarget.contains(event.relatedTarget as HTMLElement)) {
+    setDragOverClass('');
+  }
+  setDragStartClass('');
+}
+
+export function handleDragLeave(
+  event: React.DragEvent<HTMLDivElement>,
   setDragOverClass: React.Dispatch<React.SetStateAction<string>>
 ) {
   if (!(event.target instanceof HTMLElement)) return;
@@ -81,14 +93,16 @@ export function handleDragEnd(
   }
 }
 
-export function handleDragLeave(
-  event: React.DragEvent<HTMLDivElement>,
-  field: string,
-  setDragOverClass: React.Dispatch<React.SetStateAction<string>>
+export function handleDoubleClick(
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  setCanvas: (value: React.SetStateAction<IRow[]>) => void,
+  canvas: IRow[],
+  runTime: boolean
 ) {
-  if (!(event.target instanceof HTMLElement)) return;
+  if (runTime) return;
+  setCanvas(canvas.filter((item) => item.id !== e.currentTarget.id));
+}
 
-  if (!event.currentTarget.contains(event.relatedTarget as HTMLElement)) {
-    setDragOverClass('');
-  }
+export function disableChecker(className: string, id: string) {
+  return className === `calculator__row calculator__row-${id}  disable`;
 }

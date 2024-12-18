@@ -6,9 +6,9 @@
   position: absolute;
   width: 100%;
   top: -70px;
-  background-color: #f3f4f6;
   border-radius: 5px;
   display: flex;
+  gap: 10px;
   height: 38px;
   padding: 1px 2px;
 
@@ -23,24 +23,40 @@
     border-radius: 5px;
     font-size: 14px;
     font-weight: 500;
+    border: 1px rgb(237, 249, 253) solid;
+    transition: all 0.1s linear;
+    &.buttons__active .buttons__icon {
+      fill: #000;
+      stroke: #000;
+    }
+    &.buttons__active .buttons__button {
+      color: #000;
+    }
+    &:hover {
+      border: 1px rgb(237, 249, 253) solid;
+      box-shadow: var(--buttons-shadow);
+    }
   }
-  &__item-1 {
-    background-color: #f3f4f6;
+
+  &__icon {
+    fill: white;
+    stroke: white;
   }
   &__button {
     border: none;
     padding: 3px 10px;
+    color: white;
   }
   &__active {
-    background: #fff;
+    background: rgb(237, 249, 253);
   }
 }
 
 .canvas {
-  padding: 5px;
-  width: 249px;
-  height: 478px;
-  border: 2px dashed rgb(233, 233, 233);
+  padding: 15px;
+  width: 269px;
+  height: 498px;
+  border: 2px dashed #fdfdfd38;
   border-radius: 6px;
   display: flex;
   justify-content: start;
@@ -56,7 +72,7 @@
   }
 
   &__icon {
-    fill: rgb(107, 114, 128);
+    fill: white;
     width: 20px;
     height: 20px;
     margin-bottom: 10px;
@@ -64,14 +80,14 @@
 
   &__text-1 {
     text-transform: uppercase;
-    color: rgb(80, 81, 148);
+    color: rgb(255, 255, 255);
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 10px;
   }
 
   &__text-2 {
-    color: rgb(107, 114, 128);
+    color: rgb(255, 255, 255);
     font-size: 12px;
     font-weight: 400;
     line-height: 15px;
@@ -101,5 +117,5 @@
 
 .drag-start {
   transition: all 0.1s linear;
-  background-color: #f0f9ff;
+  background-color: #f4f4f513;
 }

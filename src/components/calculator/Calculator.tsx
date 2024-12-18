@@ -1,13 +1,8 @@
-import { useAppSelector } from '../../hooks/useReduxHooks';
-import { rowCalculatorItems } from '../../slice/dragAndDropSlice';
-import { IRow } from '../../types/types';
-import './calculator.scss';
 import React from 'react';
+import { rowCalculatorItems } from '../../slice/dragAndDropSlice';
+import { ICalculatorProps } from '../../types/types';
+import './calculator.scss';
 
-interface ICalculatorProps {
-  canvas: IRow[];
-  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>;
-}
 function Calculator({ canvas, setCanvas }: ICalculatorProps) {
   return (
     <div className="calculator">

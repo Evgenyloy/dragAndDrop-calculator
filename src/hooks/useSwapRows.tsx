@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { IRow } from '../types/types';
 
 export function useSwapRows(
-  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>> | undefined,
+  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>,
   canvas: IRow[],
-  currentRowId: string
+  currentRowId: string,
+  field: string
 ) {
   const [currentRowIndex, setCurrentRowIndex] = useState<number | null>(null);
   const [lyingRowIndex, setLyingRowIndex] = useState<number | null>(null);
@@ -12,7 +13,6 @@ export function useSwapRows(
   const [lyingRow, setLyingRow] = useState<IRow>();
 
   function swapRows() {
-    if (!setCanvas || !canvas) return;
     if (canvas.some((e: IRow) => e?.id === currentRowId)) {
       let newArrCanvas = canvas;
 
@@ -29,6 +29,7 @@ export function useSwapRows(
   }
 
   useEffect(() => {
+    if (field === 'calculator') return;
     swapRows();
   }, [lyingRowIndex, currentRowIndex, currentRow, lyingRow]);
 

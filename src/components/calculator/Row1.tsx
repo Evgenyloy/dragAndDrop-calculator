@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/useReduxHooks';
-import { IRow, IRowProps } from '../../types/types';
+import { IRowProps } from '../../types/types';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 import {
+  disableChecker,
+  handleDoubleClick,
   handleDragEnd,
   handleDragLeave,
   handleDragOver,
@@ -10,35 +11,32 @@ import {
   handleDrop,
 } from '../../utils/dragAndDropUtils';
 import { useSwapRows } from '../../hooks/useSwapRows';
+import { useOperation } from '../../hooks/useOperation';
 
 const Row1 = ({ canvas, setCanvas, field }: IRowProps) => {
-  const operation = useAppSelector((state) => state.calculator.operation);
-  const currentOperand = useAppSelector(
-    (state) => state.calculator.currentOperand
-  );
-  const previousOperand = useAppSelector(
-    (state) => state.calculator.previousOperand
-  );
-  const dispatch = useAppDispatch();
-  const currentRowId = useAppSelector(
-    (state) => state.dragAndDrop.currentRowId
-  );
-  const runTime = useAppSelector((state) => state.calculator.runTime);
   const [dragOverClass, setDragOverClass] = useState('');
-
+  const [dragStartClass, setDragStartClass] = useState('');
   const { className, draggable } = useDragAndDrop(canvas, field, '1');
-
+  const {
+    currentOperand,
+    operation,
+    previousOperand,
+    currentRowId,
+    runTime,
+    dispatch,
+  } = useOperation();
   const { setCurrentRow, setCurrentRowIndex, setLyingRow, setLyingRowIndex } =
-    useSwapRows(setCanvas, canvas as IRow[], currentRowId);
+    useSwapRows(setCanvas, canvas, currentRowId, field);
+  const disableCheck = disableChecker(className, '1');
 
   return (
     <div
-      className={className + ' ' + dragOverClass}
+      className={className + ' ' + dragOverClass + ' ' + dragStartClass}
       draggable={runTime ? false : draggable}
-      onDragStart={(e) => handleDragStart(e, dispatch)}
-      onDragLeave={(e) => handleDragLeave(e, field, setDragOverClass)}
-      onDragEnd={(e) => handleDragEnd(e, field, setDragOverClass)}
-      onDragOver={(e) => handleDragOver(e, field, '1', setDragOverClass)}
+      onDragStart={(e) => handleDragStart(e, dispatch, setDragStartClass)}
+      onDragLeave={(e) => handleDragLeave(e, setDragOverClass)}
+      onDragEnd={(e) => handleDragEnd(e, setDragOverClass, setDragStartClass)}
+      onDragOver={(e) => handleDragOver(e, field, setDragOverClass)}
       onDrop={(e) =>
         handleDrop(
           e,
@@ -48,14 +46,20 @@ const Row1 = ({ canvas, setCanvas, field }: IRowProps) => {
           setCurrentRow,
           setCurrentRowIndex,
           setLyingRow,
-          setLyingRowIndex
+          setLyingRowIndex,
+          disableCheck
         )
+      }
+      onDoubleClick={
+        disableCheck
+          ? undefined
+          : (e) => handleDoubleClick(e, setCanvas, canvas, runTime)
       }
       id="1"
     >
       <div className="calculator__output">
         <div className="calculator__previous-operand">
-          {`${previousOperand} ${operation}`}
+          {disableCheck ? null : `${previousOperand} ${operation}`}
         </div>
         <div
           className={
@@ -64,7 +68,7 @@ const Row1 = ({ canvas, setCanvas, field }: IRowProps) => {
               : 'calculator__current-operand'
           }
         >
-          {currentOperand}
+          {disableCheck ? null : currentOperand}
         </div>
       </div>
     </div>

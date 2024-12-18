@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { IRow } from '../types/types';
+import { useAppSelector } from './useReduxHooks';
 
 export function useDragAndDrop(
   canvas: IRow[] | undefined,
-  field: string,
+  field?: string,
   id?: string
 ) {
   const [disable, setDisable] = useState(true);
@@ -11,16 +12,19 @@ export function useDragAndDrop(
   const [className, setClassName] = useState(
     ` calculator__row calculator__row-${id}`
   );
-
+  const runTime = useAppSelector((state) => state.calculator.runTime);
   useEffect(() => {
     if (canvas?.some((el) => el.id === id)) {
       setDisable(false);
+    } else {
+      setDisable(true);
     }
-    classNameSwitcher(field, disable, setClassName, id as string);
-    dragSwitcher(field, disable, setDraggable);
-  }, [disable, canvas]);
 
-  return { disable, draggable, className };
+    classNameSwitcher(field as string, disable, setClassName, id as string);
+    dragSwitcher(field as string, disable, setDraggable);
+  }, [disable, draggable, canvas, className, runTime]);
+
+  return { disable, draggable, className, setDisable, setDraggable };
 }
 
 function classNameSwitcher(
@@ -29,7 +33,7 @@ function classNameSwitcher(
   setClassName: React.Dispatch<React.SetStateAction<string>>,
   id: string
 ) {
-  if (field === 'calculator' && disable) {
+  if (field === 'calculator' && disable === true) {
     setClassName(`calculator__row calculator__row-${id}`);
   }
   if (field === 'calculator' && disable === false) {

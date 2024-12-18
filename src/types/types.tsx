@@ -5,10 +5,12 @@ export type AppDispatch = typeof store.dispatch;
 
 export interface IOperationButtonProps {
   operation?: string;
+  disableCheck: boolean;
 }
 export interface IDigitButtonProps {
   digit: string;
   clear?: boolean;
+  disableCheck: boolean;
 }
 
 export interface IInitialState {
@@ -22,7 +24,24 @@ export interface IRow {
 }
 
 export interface IRowProps {
-  canvas?: IRow[];
-  setCanvas?: React.Dispatch<React.SetStateAction<IRow[]>>;
+  canvas: IRow[];
+  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>;
   field: string;
+}
+
+export interface ICalculatorProps {
+  canvas: IRow[];
+  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>;
+}
+
+export interface ICanvasProps {
+  canvas: IRow[];
+  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>;
+}
+
+export interface ICanvasButtonProps {
+  canvas: IRow[];
+  setCanvas: React.Dispatch<React.SetStateAction<IRow[]>>;
+  id: string;
+  text: string;
 }
