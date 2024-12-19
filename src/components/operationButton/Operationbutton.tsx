@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '../../hooks/useReduxHooks';
-import { addOperation, setRunTime } from '../../slice/calculatorSlice';
-import { IOperationButtonProps, IRow } from '../../types/types';
+import { addOperation } from '../../slice/calculatorSlice';
+import { IOperationButtonProps } from '../../types/types';
 
 export default function OperationButton({
   operation,

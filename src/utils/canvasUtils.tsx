@@ -1,6 +1,5 @@
 import { rowCalculatorItems } from '../slice/dragAndDropSlice';
 import { AppDispatch, IRow } from '../types/types';
-import { setRunTime } from '../slice/calculatorSlice';
 
 export function handleDrop(
   e: React.DragEvent<HTMLDivElement>,
